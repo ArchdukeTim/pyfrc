@@ -1,3 +1,5 @@
+import math
+
 '''
     Based on input from various drive motors, these helper functions
     simulate moving the robot in various ways. Many thanks to
@@ -131,15 +133,62 @@ def mecanum_drivetrain(lr_motor, rr_motor, lf_motor, rf_motor, x_wheelbase=2, y_
     rf = rf_motor * speed
 
     # Calculate K
-    k = abs(x_wheelbase/2) + abs(y_wheelbase/2)
+    k = abs(x_wheelbase / 2) + abs(y_wheelbase / 2)
 
     # Calculate resulting motion
     Vy = .25 * (lf + lr + rr + rf)
     Vx = .25 * (lf + -lr + rr + -rf)
-    Vw = (.25/k) * (lf + lr + -rr + -rf)
+    Vw = (.25 / k) * (lf + lr + -rr + -rf)
     
     return Vx, Vy, Vw
-    
-    
 
+
+def swerve_drive(lr_motor, rr_motor, lf_motor, rf_motor, lr_rotate, rr_rotate, lf_rotate, rf_rotate, x_wheelbase=2, y_wheelbase=3, speed=5):
+    '''
+        :param lr_motor:   Left rear motor value (-1 to 1); 1 is forward
+        :param rr_motor:   Right rear motor value (-1 to 1); 1 is forward
+        :param lf_motor:   Left front motor value (-1 to 1); 1 is forward
+        :param rf_motor:   Right front motor value (-1 to 1); 1 is forward
+        
+        :param lr_rotate:  Left rear rotate angle (-180 to 180); 0 is forward
+        :param rr_rotate:  Right rear rotate angle (-180 to 180); 0 is forward
+        :param lf_rotate:  Left front rotate angle (-180 to 180); 0 is forward
+        :param rf_rotate:  Right front rotate angle (-180 to 180); 0 is forward
+        
+        :param x_wheelbase: The distance in feet between right and left wheels.
+        :param y_wheelbase: The distance in feet between forward and rear wheels.
+        :param speed:      Speed of robot in feet per second (see above)
+        '''
+    A = 0
+    B = 0
+    C = 0
+    D = 0
+    
+    
+    
+    B = math.sqrt((lf_motor * speed) ** 2 / (1 + (1 / math.tan(bind(ticks_to_deg(lf_rotate), low=0, high=360)))))
+    D = math.sqrt(lf_motor ** 2 - B ** 2)
+    C = math.sqrt(rf_motor ** 2 - B ** 2)
+    A = math.sqrt(lr_motor ** 2 - D ** 2)
+    
+    
+    Vx = (A + B) / 2
+    Vy = (C + D) / 2
+    Vw = B - Vx * (2 / y_wheelbase)
+    
+    return Vx, Vy, Vw
+
+
+def ticks_to_deg(tick):
+    deg = round((tick / 1023) * 360)
+    deg = deg % 360
+    if deg < -180:
+        deg += 360 
+    return deg
+    
+def bind(val, low=-180, high=180):
+    if val == -180:
+        return 180
+    diff = high - low
+    return (((val - low) % diff) + low)
 # TODO: swerve drive, etc
