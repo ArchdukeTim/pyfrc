@@ -1,5 +1,4 @@
 import math
-
 '''
     Based on input from various drive motors, these helper functions
     simulate moving the robot in various ways. Many thanks to
@@ -166,7 +165,7 @@ def swerve_drive(lr_motor, rr_motor, lf_motor, rf_motor, lr_rotate, rr_rotate, l
     
     
     
-    B = math.sqrt((lf_motor * speed) ** 2 / (1 + (1 / math.tan(bind(ticks_to_deg(lf_rotate), low=0, high=360)))))
+    B = math.sqrt((lf_motor * speed) ** 2 / (1 + (1 / math.tan(math.radians(bind(ticks_to_deg(lf_rotate), low=0, high=360))))))
     D = math.sqrt(lf_motor ** 2 - B ** 2)
     C = math.sqrt(rf_motor ** 2 - B ** 2)
     A = math.sqrt(lr_motor ** 2 - D ** 2)
